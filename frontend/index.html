@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ecommerce T6</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="WSClient.js"></script>
+    <script>
+      let URL = "/Servicio/rest/ws";
+      function get(id) {
+        return document.getElementById(id);
+      }
+      function alta() {
+        let cliente = new WSClient(URL);
+        let articulo = {
+          descripcion: get("description").value,
+          precio: get("price").value,
+          cantidad: get("quantity").value,
+        };
+        alert(URL+"/alta_articulo");
+        alert(JSON.stringify(articulo));
+        cliente.postJson("alta_articulo", { articulo: articulo },function(code,result){
+            if(code==200)
+                alert("Registro insertado correctamente");
+            else
+                alert(JSON.stringify(result));
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Captura de Artículos</h1>
+    <form id="addItemForm">
+      <div class="form-group">
+        <label for="description">Descripción:</label>
+        <input type="text" id="description" required />
+      </div>
+      <div class="form-group">
+        <label for="price">Precio:</label>
+        <input type="number" id="price" required />
+      </div>
+      <div class="form-group">
+        <label for="quantity">Cantidad en Almacén:</label>
+        <input type="number" id="quantity" required />
+      </div>
+      <div class="form-group">
+        <label for="photo">Fotografía:</label>
+        <input type="file" id="photo" />
+      </div>
+      <button type="button" onclick="alta()">Guardar</button>
+    </form>
+  </body>
+</html>
