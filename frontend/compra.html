@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compra de Artículos</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="WSClient.js"></script>
+    <script>
+        let URL="/";
+        function get(id)
+			{
+				return document.getElementById(id);
+			}
+        function consulta(){
+            
+            let cliente=new WSClient(URL);
+            let articulo={
+                searchButton:get('searchKeyword').value,
+                
+            }
+            alert(JSON.stringify(articulo));
+
+        }
+    </script>
+</head>
+<body>
+    <h1>Compra de Artículos</h1>
+    <div>
+        <label for="searchKeyword">Buscar por descripción:</label>
+        <input type="text" id="searchKeyword">
+        <button id="searchButton" type="button" onclick="consulta()">Buscar</button>
+    </div>
+    <div id="searchResults">
+        <!-- Los resultados de la búsqueda se mostrarán aquí -->
+    </div>
+    <div id="noResultsMessage" style="display: none;">
+        No se encontraron resultados.
+    </div>
+    <button id="cartButton">Carrito de Compra</button>
+</body>
+
+</html>
