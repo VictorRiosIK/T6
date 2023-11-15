@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Compra de Artículos</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="WSClient.js"></script>
+    <script>
+      let URL = "/Servicio/rest/tienda";
+      function get(id) {
+        return document.getElementById(id);
+      }
+      function muestra(id) {
+        get(id).style.display = "block";
+      }
+      function oculta(id) {
+        get(id).style.display = "none";
+      }
+      //oculta("tablaCarrito");
+
+      function verCarrito() {
+        muestra("tablaCarrito");
+        traerDatosCarrito();
+      }
+      function traerDatosCarrito(){
+        alert("trae carrito");
+        let cliente = new WSClient(URL);
+        cliente.postJson("trae_carrito",{},function(code,result){
+            if(code==200){
+                let tableCarrito=get('tableCarrito');
+                tableCarrito.innerHTML='';
+                alert(JSON.stringify(result));
+                result.forEach(function(item){
+                    let row = tableCarrito.insertRow(),
+                  description = row.insertCell(0),
+                  precio = row.insertCell(1)
+                  cantidadCarrito = row.insertCell(2),
+                  total = row.insertCell(3),
+                  botonEliminar=row.insertCell(4),
+                  botones=row.insertCell(5);
+                  description.textContent = item.descripcion;
+                precio.textContent = item.precio;
+                cantidadCarrito.textContent = item.cantidadCarrito;
+                total.textContent=''+(item.precio*item.cantidadCarrito)+'';
+
+                let btnEliminar = document.createElement("button");
+                btnEliminar.textContent = "Eliminar articulo";
+                let botonAnadir = document.createElement("button");
+                botonAnadir.textContent = "+";
+                let botonResta = document.createElement("button");
+                botonResta.textContent = "-";
+                
+                btnEliminar.addEventListener("click", function () {
+                  // Construir el mensaje de confirmación
+                    let mensaje = "¿Estás seguro de eliminar " + item.cantidadCarrito + " unidad(es) de '" + item.descripcion + "' del carrito de compra?";
+
+                    // Mostrar la ventana de confirmación y obtener la respuesta del usuario
+                    let confirmacion = window.confirm(mensaje);
+                    if (confirmacion) {
+                      
+                      eliminarArticulo(item.idA,item.idCompra);
+
+                    }
+                });
+
+
+                botonAnadir.addEventListener("click", function () {
+                  // Construir el mensaje de confirmación
+                    let mensaje = "¿Estás seguro de eliminar " + item.cantidadCarrito + " unidad(es) de '" + item.descripcion + "' del carrito de compra?";
+
+                    // Mostrar la ventana de confirmación y obtener la respuesta del usuario
+                    let confirmacion = window.confirm(mensaje);
+                    if (confirmacion) {
+                      // Aquí puedes agregar la lógica para eliminar el artículo del carrito
+                      alert("¡Artículo eliminado del carrito!");
+                    }
+                });
+
+                botonResta.addEventListener("click", function () {
+                  // Construir el mensaje de confirmación
+                    let mensaje = "¿Estás seguro de eliminar " + item.cantidadCarrito + " unidad(es) de '" + item.descripcion + "' del carrito de compra?";
+
+                    // Mostrar la ventana de confirmación y obtener la respuesta del usuario
+                    let confirmacion = window.confirm(mensaje);
+                    if (confirmacion) {
+                      // Aquí puedes agregar la lógica para eliminar el artículo del carrito
+                      alert("¡Artículo eliminado del carrito!");
+                    }
+                });
+
+                
+                botonEliminar.appendChild(btnEliminar);
+                botones.appendChild(botonAnadir);
+                botones.appendChild(botonResta);
+                });
+                let botonEliminarCarrito = document.createElement("button");
+                botonEliminarCarrito.textContent = "Eliminar Carrito";
+                botonEliminarCarrito.addEventListener("click", function () {
+                  // Construir el mensaje de confirmación
+                  var mensaje = "¿Estás seguro de eliminar todo el carrito de compra?";
+
+                  // Mostrar la ventana de confirmación y obtener la respuesta del usuario
+                  var confirmacion = window.confirm(mensaje);
+
+                  // Verificar la respuesta del usuario
+                  if (confirmacion) {
+                      alert("¡Carrito de compra eliminado!");
+                  }
+                });
+                
+                let row = tableCarrito.insertRow(),
+                botonEliminarCarritoCompleto = row.insertCell(0);
+                botonEliminarCarritoCompleto.appendChild(botonEliminarCarrito);
+
+            }else{
+                alert(JSON.stringify(result));
+            }
+        });
+      }
+      function eliminarArticulo(idArticulo,idCompra){
+        cliente.postJson("elimina_articulo",{
+          id: idArticulo,
+          idCompra
+        }, function (code,result){
+          alert(JSON.stringify(result));
+        })
+      }
+      function consulta() {
+        let cliente = new WSClient(URL);
+        cliente.postJson(
+          "consulta_articulo",
+          {
+            descripcion: get("searchKeyword").value,
+          },
+          function (code, result) {
+            if (code == 200) {
+              alert(JSON.stringify(result));
+              let jsonTable = get("jsonTable");
+              jsonTable.innerHTML = "";
+
+              result.forEach(function (item) {
+                let row = jsonTable.insertRow(),
+                  description = row.insertCell(0),
+                  precio = row.insertCell(1),
+                  cantidad = row.insertCell(2);
+                description.textContent = item.descripcion;
+                precio.textContent = item.precio;
+                cantidad.textContent = item.cantidad;
+
+                //boton de cantidad
+                let inputCantidad = document.createElement("input");
+                inputCantidad.type = "number";
+                inputCantidad.value = 1;
+
+                //boton de compra
+                let botonCompra = document.createElement("button");
+                botonCompra.textContent = "Comprar";
+                botonCompra.addEventListener("click", function () {
+                  let cantidadSeleccionada = inputCantidad.value;
+                  // alert("Se quieren comprar:" + cantidadSeleccionada + " del articulo: " + item.descripcion);
+                  if (cantidadSeleccionada <= item.cantidad) {
+                    alert("Se puede comprar");
+                    compraArticulo(
+                      item.idA,
+                      cantidadSeleccionada,
+                      item.cantidad
+                    );
+                  } else {
+                    alert(
+                      "La cantidad disponible de articulos que quiere comprar es de: " +
+                        item.cantidad
+                    );
+                  }
+                });
+                let boton = row.insertCell(3);
+                boton.appendChild(inputCantidad);
+                boton.appendChild(botonCompra);
+              });
+            } else {
+              alert(JSON.stringify(result));
+            }
+          }
+        );
+      }
+      function compraArticulo(id, cantidad, cantidadStock) {
+        alert(
+          "Comprando: " +
+            id +
+            " la cantidad de: " +
+            cantidad +
+            " con stock de: " +
+            cantidadStock
+        );
+        let cliente = new WSClient(URL);
+        cliente.postJson(
+          "inserta_compra",
+          {
+            id,
+            cantidad,
+            stock: cantidadStock,
+          },
+          function (code, result) {
+            if (code == 200) {
+              alert("Articulo agregado correctamente a su carrito de compra");
+            } else {
+              alert(JSON.stringify(result));
+            }
+          }
+        );
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Compra de Articulos</h1>
+    <div>
+      <label for="searchKeyword">Buscar por descripcion:</label>
+      <input type="text" value="" id="searchKeyword" />
+      <button id="searchButton" type="button" onclick="consulta()">
+        Buscar
+      </button>
+      <button id="cartButton" type="button" onclick="verCarrito()">
+        Ver carrito de Compra
+      </button>
+    </div>
+    
+    
+
+    <div>
+        <table border="1">
+            <thead>
+              <tr>
+                <th>Descripcion</th>
+                <th>Precio</th>
+                <th>Cantidad en almacen</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="jsonTable"></tbody>
+          </table>
+    </div>
+    
+
+    <div id="tablaCarrito">
+      <h2>Carrito de compras</h2>
+      <table border="1" >
+        <thead>
+          <tr>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Cantidad en carrito</th>
+            <th>Total</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tableCarrito"></tbody>
+      </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
