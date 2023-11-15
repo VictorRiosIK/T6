@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Ecommerce</title>
+    <title>Ecommerce T6</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="WSClient.js"></script>
     <script>
-      let URL = "/Servicio/rest/ws";
+      let URL = "/Servicio/rest/tienda";
       function get(id) {
         return document.getElementById(id);
       }
@@ -16,7 +16,7 @@
           precio: get("price").value,
           cantidad: get("quantity").value,
         };
-        alert(URL+"/alta_articulo");
+        alert(URL +"/alta_articulo");
         alert(JSON.stringify(articulo));
         cliente.postJson("alta_articulo", { articulo: articulo },function(code,result){
             if(code==200)
@@ -24,6 +24,9 @@
             else
                 alert(JSON.stringify(result));
         });
+      }
+      function busqueda(){
+        let cliente = new WSClient(URL);
       }
     </script>
   </head>
