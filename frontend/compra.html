@@ -30,7 +30,10 @@
                 tableCarrito.innerHTML='';
                 alert(JSON.stringify(result));
                 result.forEach(function(item){
+                  
+                  
                     let row = tableCarrito.insertRow(),
+                    
                   description = row.insertCell(0),
                   precio = row.insertCell(1)
                   cantidadCarrito = row.insertCell(2),
@@ -41,7 +44,7 @@
                 precio.textContent = item.precio;
                 cantidadCarrito.textContent = item.cantidadCarrito;
                 total.textContent=''+(item.precio*item.cantidadCarrito)+'';
-
+                
                 let btnEliminar = document.createElement("button");
                 btnEliminar.textContent = "Eliminar articulo";
                 let botonAnadir = document.createElement("button");
@@ -65,13 +68,21 @@
 
                 botonAnadir.addEventListener("click", function () {
                   // Construir el mensaje de confirmación
-                    let mensaje = "¿Estás seguro de eliminar " + item.cantidadCarrito + " unidad(es) de '" + item.descripcion + "' del carrito de compra?";
+                    let mensaje = "¿Estás seguro de añadir " + item.cantidadCarrito + " unidad(es) de '" + item.descripcion + "' al carrito de compra?";
 
                     // Mostrar la ventana de confirmación y obtener la respuesta del usuario
                     let confirmacion = window.confirm(mensaje);
                     if (confirmacion) {
-                      // Aquí puedes agregar la lógica para eliminar el artículo del carrito
-                      alert("¡Artículo eliminado del carrito!");
+                      
+                      let cliente = new WSClient(URL);
+                      cliente.postJson("incrementa_cantidad_carrito",{
+                        idArticulo:item.idA,
+                        idCompra:item.idCompra
+                      }, function (code,result){
+                        if(code ==200){
+                          alert("Articulo agregado correctamente");
+                        }
+                      })
                     }
                 });
 
@@ -83,7 +94,15 @@
                     let confirmacion = window.confirm(mensaje);
                     if (confirmacion) {
                       // Aquí puedes agregar la lógica para eliminar el artículo del carrito
-                      alert("¡Artículo eliminado del carrito!");
+                      let cliente = new WSClient(URL);
+                      cliente.postJson("decrementa_cantidad_carrito",{
+                        idArticulo:item.idA,
+                        idCompra:item.idCompra
+                      }, function (code,result){
+                        if(code ==200){
+                          alert("Articulo decrementado correctamente");
+                        }
+                      })
                     }
                 });
 
@@ -103,7 +122,14 @@
 
                   // Verificar la respuesta del usuario
                   if (confirmacion) {
-                      alert("¡Carrito de compra eliminado!");
+                    let cliente = new WSClient(URL);
+                      cliente.postJson("elimina_carrito_completo",{
+                        
+                      }, function (code,result){
+                        if(code ==200){
+                            alert("Articulo eliminado correctamente");
+                          }     
+                      })
                   }
                 });
                 
@@ -117,11 +143,14 @@
         });
       }
       function eliminarArticulo(idArticulo,idCompra){
+        let cliente = new WSClient(URL);
         cliente.postJson("elimina_articulo",{
-          id: idArticulo,
+          idArticulo,
           idCompra
         }, function (code,result){
-          alert(JSON.stringify(result));
+          if(code ==200){
+            alert("Articulo eliminado correctamente");
+          }
         })
       }
       function consulta() {
@@ -138,14 +167,22 @@
               jsonTable.innerHTML = "";
 
               result.forEach(function (item) {
+                var imagen = new Image();
+                  // Configurar el evento de carga de la imagen
+                  
+                  imagen.src = "data:image/jpg;base64," + item.foto;
                 let row = jsonTable.insertRow(),
-                  description = row.insertCell(0),
-                  precio = row.insertCell(1),
-                  cantidad = row.insertCell(2);
+                foto=row.insertCell(0),
+                description = row.insertCell(1),
+                precio = row.insertCell(2),
+                cantidad = row.insertCell(3);
                 description.textContent = item.descripcion;
                 precio.textContent = item.precio;
                 cantidad.textContent = item.cantidad;
-
+                imagen.onload = function() {
+                    // Agregar la imagen al contenedor
+                    foto.appendChild(imagen);
+                  };
                 //boton de cantidad
                 let inputCantidad = document.createElement("input");
                 inputCantidad.type = "number";
@@ -220,6 +257,7 @@
       <button id="cartButton" type="button" onclick="verCarrito()">
         Ver carrito de Compra
       </button>
+      
     </div>
     
     
@@ -228,6 +266,7 @@
         <table border="1">
             <thead>
               <tr>
+                <th>foto</th>
                 <th>Descripcion</th>
                 <th>Precio</th>
                 <th>Cantidad en almacen</th>
