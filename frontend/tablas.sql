@@ -8,4 +8,11 @@ CREATE TABLE carrito_compra(
 	idCompra INT AUTO_INCREMENT PRIMARY KEY,
 	id INT ,
     cantidad INT
-)
+);
+
+CREATE table fotos_articulos
+(
+    id_foto integer auto_increment primary key,
+    foto longblob,
+    id_usuario integer not null
+);

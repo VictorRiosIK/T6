@@ -433,7 +433,7 @@ public class Servicio
     Connection conexion = pool.getConnection();
     try {
       
-      PreparedStatement st=conexion.prepareStatement("SELECT * from articulos a RIGHT OUTER JOIN carrito_compra c ON c.id=a.id");
+      PreparedStatement st=conexion.prepareStatement("SELECT * from articulos a RIGHT OUTER JOIN carrito_compra c ON c.id=a.id INNER JOIN fotos_articulos ON c.id=fotos_articulos.id_usuario");
       
       
       ResultSet rs=st.executeQuery();
@@ -448,6 +448,7 @@ public class Servicio
           b.cantidad=rs.getInt(4);
           b.idCompra=rs.getInt(5);
           b.cantidadCarrito=rs.getInt(7);
+          b.foto=rs.getBytes("foto");
           listaArticulos.add(b);
           
 

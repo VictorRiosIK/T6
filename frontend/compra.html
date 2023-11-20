@@ -30,21 +30,28 @@
                 tableCarrito.innerHTML='';
                 alert(JSON.stringify(result));
                 result.forEach(function(item){
+                  var imagen = new Image();
+                  // Configurar el evento de carga de la imagen
                   
+                  imagen.src = "data:image/jpg;base64," + item.foto;
                   
                     let row = tableCarrito.insertRow(),
-                    
-                  description = row.insertCell(0),
-                  precio = row.insertCell(1)
-                  cantidadCarrito = row.insertCell(2),
-                  total = row.insertCell(3),
-                  botonEliminar=row.insertCell(4),
-                  botones=row.insertCell(5);
+                  foto=row.insertCell(0),
+                  description = row.insertCell(1),
+                  precio = row.insertCell(2)
+                  cantidadCarrito = row.insertCell(3),
+                  total = row.insertCell(4),
+                  botonEliminar=row.insertCell(5),
+                  botones=row.insertCell(6);
                   description.textContent = item.descripcion;
                 precio.textContent = item.precio;
                 cantidadCarrito.textContent = item.cantidadCarrito;
                 total.textContent=''+(item.precio*item.cantidadCarrito)+'';
-                
+                imagen.onload = function() {
+                    // Agregar la imagen al contenedor
+                    foto.appendChild(imagen);
+                    imagen.width = 100;
+                  };
                 let btnEliminar = document.createElement("button");
                 btnEliminar.textContent = "Eliminar articulo";
                 let botonAnadir = document.createElement("button");
@@ -182,6 +189,7 @@
                 imagen.onload = function() {
                     // Agregar la imagen al contenedor
                     foto.appendChild(imagen);
+                    imagen.width = 100;
                   };
                 //boton de cantidad
                 let inputCantidad = document.createElement("input");
@@ -283,6 +291,7 @@
       <table border="1" >
         <thead>
           <tr>
+            <th>foto</th>
             <th>Descripcion</th>
             <th>Precio</th>
             <th>Cantidad en carrito</th>
